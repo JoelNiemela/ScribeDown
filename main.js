@@ -449,7 +449,7 @@ class Parser {
     }
 
     const content = [];
-    while (this.tokens.hasNext()) {
+    while (this.tokens.hasNext() && this.tokens.peek().tok === Tok.TEXT) {
       if (this.tokens.peek().val === start[0]) {
         this.tokens.next();
         if (start.length === 1 || this.tokens.peek()?.val === start[1]) {
