@@ -1,3 +1,5 @@
+import ParseError from  "./parser.js";
+
 export default class Buffer {
   constructor(tokens) {
     this.tokens = tokens;

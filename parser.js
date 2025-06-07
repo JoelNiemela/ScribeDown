@@ -2,7 +2,7 @@ import Buffer from "./buffer.js";
 import { Tok } from "./lexer.js";
 import * as ast from "./ast.js";
 
-class ParseError extends Error {}
+export class ParseError extends Error {}
 
 export default class Parser {
   constructor(tokens) {
@@ -167,8 +167,8 @@ export default class Parser {
 
   parseParagraph() {
     const lines = [];
-    while (this.tokens.hasNext() && this.tokens.peek().val !== '\n' && this.tokens.peek().tok === Tok.TEXT) {
-      const line = this.parseInline();
+    while (this.tokens.hasNext() && this.tokens.peek().tok === Tok.TEXT) {
+      const line = this.parseLine();
       lines.push(line);
     }
 
@@ -177,12 +177,14 @@ export default class Parser {
 
   parseLine() {
     const content = [];
-    while (this.tokens.hasNext() && this.tokens.peek().val !== '\n') {
+    while (this.tokens.hasNext() && this.tokens.peek().val !== '\n' && this.tokens.peek().tok === Tok.TEXT) {
       const node = this.parseInline();
       content.push(node);
     }
 
-    this.tokens.expectOrEOF('\n');
+    if (this.tokens.peek()?.tok !== Tok.BLANK_LINE) {
+      this.tokens.expectOrEOF('\n');
+    }
 
     return new ast.LineNode(content);
   }
@@ -219,7 +221,7 @@ export default class Parser {
     }
 
     const content = [];
-    while (this.tokens.hasNext() && this.tokens.peek().tok === Tok.TEXT) {
+    while (this.tokens.hasNext() && this.tokens.peek().tok === Tok.TEXT && this.tokens.peek().val !== '\n') {
       if (this.tokens.peek().val === start[0]) {
         this.tokens.next();
         if (start.length === 1 || this.tokens.peek()?.val === start[1]) {
@@ -244,6 +246,7 @@ export default class Parser {
       && this.tokens.peek().tok === Tok.TEXT
       && !this.styleChars.test(this.tokens.peek().val)
       && !this.layoutChars.test(this.tokens.peek().val)
+      && this.tokens.peek().val !== '\n'
   ) {
       text += this.tokens.next().val;
     }

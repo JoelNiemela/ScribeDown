@@ -9,7 +9,6 @@ const toks = document.querySelector('#toks');
 const none = document.querySelector('#none');
 
 function update() {
-  console.log('update');
   const lexer = new Lexer(editor.value);
   const tokens = lexer.tokenize();
   const parser = new Parser(tokens);
